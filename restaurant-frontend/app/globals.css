@@ -1,0 +1,27 @@
+@import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Inter", "Tahoma", sans-serif;
+  --color-brand: #ea580c;
+}
+
+:root {
+  --background: #F8F9FB;
+}
+
+body {
+  background-color: var(--background);
+  color: #111;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* گردی مخصوص کارت‌های ژورنالی */
+.card-rounded { border-radius: 50px; }
+
+/* حذف اسکرول‌بار برای حس اپلیکیشن */
+@utility no-scrollbar {
+  &::-webkit-scrollbar { display: none; }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
