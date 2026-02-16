@@ -32,6 +32,7 @@ class User(SQLModel, table=True):
 class DailyStat(SQLModel, table=True):
     date: dt_date = Field(primary_key=True)
     total_visits: int = Field(default=0)
+    total_orders: int = Field(default=0)
     total_revenue: float = Field(default=0.0)
     
 class Review(SQLModel, table=True):
