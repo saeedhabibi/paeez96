@@ -20,11 +20,10 @@ def seed_data():
         # 1. Check if database has data
         existing_cat = session.exec(select(Category)).first()
         if existing_cat:
-            print("Database already has data. Skipping seed.")
-            return
-
-        # ۲. تعریف دسته‌بندی‌ها
-        cat_steaks = Category(name="Signature Steaks", name_fa="استیک‌های ویژه", slug="signature-steaks")
+            print("Categories already exist. Skipping category/item seed.")
+        else:
+            # ۲. تعریف دسته‌بندی‌ها
+            cat_steaks = Category(name="Signature Steaks", name_fa="استیک‌های ویژه", slug="signature-steaks")
         cat_local = Category(name="Local Favorites", name_fa="غذاهای محلی", slug="local-favorites")
         cat_seafood = Category(name="Seafood", name_fa="دریایی", slug="seafood")
 
@@ -110,9 +109,34 @@ def seed_data():
             ),
         ]
 
-        session.add_all(items)
-        session.commit()
-        print("Successfully seeded 3 categories and 5 menu items!")
+            session.add_all(items)
+            session.commit()
+            print("Successfully seeded 3 categories and 5 menu items!")
+
+        # 4. Seed Daily Stats (Last 7 Days) - Check independently
+        print("Checking daily stats...")
+        today = date.today()
+        stats_exist = session.exec(select(DailyStat).where(DailyStat.date == today)).first()
+        
+        if not stats_exist:
+            print("Seeding daily stats for the last 7 days...")
+            for i in range(7):
+                day = today - timedelta(days=i)
+                # Check if stat exists for this specific day
+                stat = session.exec(select(DailyStat).where(DailyStat.date == day)).first()
+                if not stat:
+                    daily_stat = DailyStat(
+                        date=day,
+                        total_visits=random.randint(50, 200),
+                        total_orders=random.randint(10, 50),
+                        total_revenue=random.randint(5000000, 25000000)
+                    )
+                    session.add(daily_stat)
+            
+            session.commit()
+            print("Daily stats seeded successfully!")
+        else:
+            print("Daily stats already exist. Skipping.")
 
 if __name__ == "__main__":
     create_db_and_tables() # اطمینان از وجود جداول
