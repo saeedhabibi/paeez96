@@ -2,6 +2,9 @@ from sqlmodel import Session, select
 from database import engine, create_db_and_tables
 from models import Category, MenuItem, User
 from auth import get_password_hash
+from datetime import date, timedelta
+import random
+from models import DailyStat
 
 def seed_data():
     with Session(engine) as session:
