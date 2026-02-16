@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlmodel import Session, select, delete, func
+from sqlmodel import Session, select, delete, func, text
 from typing import List
 from datetime import timedelta, date as dt_date
 from pydantic import BaseModel
@@ -48,7 +48,21 @@ def on_startup():
     print(f"Database URL detected: {'YES' if os.getenv('DATABASE_URL') else 'NO'}")
     print(f"Engine Dialect: {engine.dialect.name}")
     print(f"-----------------------------")
+    print(f"-----------------------------")
     create_db_and_tables()
+
+    # --- Schema Migration for DailyStat ---
+    try:
+        with Session(engine) as session:
+            # Check if column exists or just try to add it (Postgres specific: IF NOT EXISTS is for table, for column we need a bit more or just try/except)
+            # Simpler approach for this specific issue: execute raw SQL to add column if not exists
+            # Note: SQLite and Postgres have different syntax for IF NOT EXISTS on column.
+            # But since we are targeting Railway (Postgres), we can use:
+            session.exec(text("ALTER TABLE dailystat ADD COLUMN IF NOT EXISTS total_orders INTEGER DEFAULT 0"))
+            session.commit()
+            print("Migration: 'total_orders' column added/verified.")
+    except Exception as e:
+        print(f"Migration warning: {e}")
     
     # Auto-seed if SEED env var is set (for Railway)
     if os.getenv("SEED", "false").lower() == "true":
