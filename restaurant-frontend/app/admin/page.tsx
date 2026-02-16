@@ -10,6 +10,7 @@ import {
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
+import ImageUploader from '../components/ImageUploader';
 
 // --- Types ---
 
