@@ -111,9 +111,10 @@ export default function AdminDashboard() {
     const fetchData = async (authToken: string) => {
         try {
             setLoading(true);
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
             const [menuRes, statsRes] = await Promise.all([
-                fetch('http://127.0.0.1:8000/api/menu'),
-                fetch('http://127.0.0.1:8000/api/stats', {
+                fetch(`${apiUrl}/api/menu`),
+                fetch(`${apiUrl}/api/stats`, {
                     headers: { Authorization: `Bearer ${authToken}` }
                 })
             ]);
@@ -324,7 +325,8 @@ const MenuManagement = ({ categories, token, refresh }: { categories: Category[]
 
     const handleDelete = async (id: number) => {
         if (!confirm('مطمئن هستید؟')) return;
-        await fetch(`http://127.0.0.1:8000/api/items/${id}`, {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+        await fetch(`${apiUrl}/api/items/${id}`, {
             method: 'DELETE',
             headers: { Authorization: `Bearer ${token}` }
         });
@@ -405,9 +407,10 @@ const MenuManagement = ({ categories, token, refresh }: { categories: Category[]
                     categories={categories}
                     onClose={() => setIsModalOpen(false)}
                     onSave={async (data: any) => {
+                        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
                         const url = editingItem
-                            ? `http://127.0.0.1:8000/api/items/${editingItem.id}`
-                            : 'http://127.0.0.1:8000/api/items';
+                            ? `${apiUrl}/api/items/${editingItem.id}`
+                            : `${apiUrl}/api/items`;
                         const method = editingItem ? 'PUT' : 'POST';
 
                         await fetch(url, {
@@ -432,7 +435,8 @@ const CategoryManagement = ({ categories, token, refresh }: { categories: Catego
 
     const handleDelete = async (id: number) => {
         if (!confirm('آیا مطمئن هستید؟ با حذف دسته‌بندی، غذاهای آن نیز حذف نمی‌شوند اما دسته‌بندی آنها نامشخص می‌شود.')) return;
-        await fetch(`http://127.0.0.1:8000/api/categories/${id}`, {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+        await fetch(`${apiUrl}/api/categories/${id}`, {
             method: 'DELETE',
             headers: { Authorization: `Bearer ${token}` }
         });
@@ -499,7 +503,8 @@ const CategoryManagement = ({ categories, token, refresh }: { categories: Catego
                 <CategoryModal
                     onClose={() => setIsModalOpen(false)}
                     onSave={async (data: any) => {
-                        await fetch('http://127.0.0.1:8000/api/categories', {
+                        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+                        await fetch(`${apiUrl}/api/categories`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                             body: JSON.stringify(data)
