@@ -159,4 +159,17 @@ def seed_data():
 
 if __name__ == "__main__":
     create_db_and_tables() # اطمینان از وجود جداول
+    
+    # --- Schema Migration for DailyStat (Direct Execution Fix) ---
+    try:
+        from database import engine
+        from sqlmodel import Session, text
+        with Session(engine) as session:
+            # Add total_orders column if missing
+            session.exec(text("ALTER TABLE dailystat ADD COLUMN IF NOT EXISTS total_orders INTEGER DEFAULT 0"))
+            session.commit()
+            print("Migration (seed.py): 'total_orders' column added/verified.")
+    except Exception as e:
+        print(f"Migration warning (seed.py): {e}")
+
     seed_data()
