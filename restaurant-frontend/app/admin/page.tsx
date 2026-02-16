@@ -722,10 +722,13 @@ const ItemModal = ({ item, categories, onClose, onSave }: any) => {
                                 onChange={e => setFormData({ ...formData, image_url: e.target.value })}
                                 placeholder="https://..."
                             />
-                            <div className="mt-2 flex items-center gap-2">
-                                <span className="text-xs text-slate-400">تصویر ندارید؟</span>
-                                <a
-                                    href="https://imgbb.com/"
+                        <div className="col-span-1 md:col-span-2">
+                            <label className="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-300">تصویر</label>
+                            <ImageUploader 
+                                value={formData.image_url || ''}
+                                onChange={(url) => setFormData({ ...formData, image_url: url })}
+                            />
+                        </div>
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-xs font-bold text-amber-500 hover:underline flex items-center gap-1"
@@ -759,8 +762,8 @@ const ItemModal = ({ item, categories, onClose, onSave }: any) => {
                         <button type="button" onClick={onClose} className="px-6 py-3 rounded-xl text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white font-bold transition">انصراف</button>
                         <button type="submit" className="px-6 py-3 rounded-xl bg-amber-500 text-white font-bold hover:bg-amber-600 shadow-lg shadow-amber-500/20 active:scale-95 transition">ذخیره</button>
                     </div>
-                </form>
-            </div>
-        </div>
+                </form >
+            </div >
+        </div >
     );
 };
