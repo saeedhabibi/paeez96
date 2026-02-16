@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
     LayoutGrid, Utensils, Menu, Users, DollarSign, TrendingUp,
     LogOut, Plus, Search, Edit, Trash2, ChevronLeft, ChevronRight,
-    BarChart3, X, Layers, Bell, Settings, Sun, Moon
+    BarChart3, X, Layers, Bell, Settings, Sun, Moon, ExternalLink
 } from 'lucide-react';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -588,7 +588,11 @@ const CategoryModal = ({ onClose, onSave }: any) => {
                             className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-800 dark:text-white text-left focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
                             dir="ltr"
                             value={formData.name}
-                            onChange={e => setFormData({ ...formData, name: e.target.value })}
+                            onChange={e => {
+                                const name = e.target.value;
+                                const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+                                setFormData({ ...formData, name, slug });
+                            }}
                             required
                         />
                     </div>
@@ -599,9 +603,10 @@ const CategoryModal = ({ onClose, onSave }: any) => {
                             dir="ltr"
                             value={formData.slug}
                             onChange={e => setFormData({ ...formData, slug: e.target.value })}
+                            placeholder="e.g. signature-steaks (Auto-generated)"
                             required
-                            placeholder="e.g. signature-steaks"
                         />
+                        <p className="text-[10px] text-slate-400 mt-1">این فیلد به صورت خودکار از روی نام انگلیسی ساخته می‌شود.</p>
                     </div>
                     <div className="flex justify-end gap-3 mt-8 pt-4 border-t border-slate-100 dark:border-white/10">
                         <button type="button" onClick={onClose} className="px-6 py-3 rounded-xl text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white font-bold transition">انصراف</button>
@@ -672,7 +677,20 @@ const ItemModal = ({ item, categories, onClose, onSave }: any) => {
                                 dir="ltr"
                                 value={formData.image_url || ''}
                                 onChange={e => setFormData({ ...formData, image_url: e.target.value })}
+                                placeholder="https://..."
                             />
+                            <div className="mt-2 flex items-center gap-2">
+                                <span className="text-xs text-slate-400">تصویر ندارید؟</span>
+                                <a
+                                    href="https://imgbb.com/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-xs font-bold text-amber-500 hover:underline flex items-center gap-1"
+                                >
+                                    آپلود رایگان عکس (ImgBB)
+                                    <ExternalLink size={10} />
+                                </a>
+                            </div>
                         </div>
                         <div className="col-span-1 md:col-span-2">
                             <label className="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-300">توضیحات</label>
