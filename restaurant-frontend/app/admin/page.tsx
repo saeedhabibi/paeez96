@@ -133,23 +133,7 @@ export default function AdminDashboard() {
         router.push('/admin/login');
     };
 
-    if (loading) return (
-        <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-amber-500 font-bold">
-            <div className="animate-pulse flex flex-col items-center gap-4">
-                <div className="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
-                <span>در حال بارگذاری...</span>
-            </div>
-        </div>
-    );
 
-    if (!stats && activeTab === 'dashboard') return (
-        <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-red-500 font-bold">
-            <div className="flex flex-col items-center gap-4">
-                <p>خطا در دریافت اطلاعات داشبورد.</p>
-                <button onClick={() => window.location.reload()} className="px-4 py-2 bg-red-500/10 rounded-lg hover:bg-red-500/20">تلاش مجدد</button>
-            </div>
-        </div>
-    );
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 flex text-slate-800 dark:text-slate-200 font-sans selection:bg-amber-500/30 transition-colors duration-300" dir="rtl">
@@ -246,7 +230,29 @@ export default function AdminDashboard() {
                         </div>
                     </div>
 
-                    {activeTab === 'dashboard' && stats && (
+                    {/* Loading State */}
+                    {loading && (
+                        <div className="flex-1 flex items-center justify-center min-h-[400px]">
+                            <div className="animate-pulse flex flex-col items-center gap-4 text-amber-500">
+                                <div className="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+                                <span className="font-bold">در حال بارگذاری...</span>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Error State */}
+                    {!loading && !stats && activeTab === 'dashboard' && (
+                        <div className="flex-1 flex items-center justify-center min-h-[400px] text-red-500 font-bold">
+                            <div className="flex flex-col items-center gap-4">
+                                <p>خطا در دریافت اطلاعات داشبورد.</p>
+                                <button onClick={() => window.location.reload()} className="px-4 py-2 bg-red-500/10 rounded-lg hover:bg-red-500/20">تلاش مجدد</button>
+                                <p className="text-xs text-slate-500 font-normal mt-2">ممکن است نیاز به ورود مجدد باشد.</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Content */}
+                    {!loading && activeTab === 'dashboard' && stats && (
                         <DashboardView stats={stats} />
                     )}
                     {activeTab === 'menu' && (
