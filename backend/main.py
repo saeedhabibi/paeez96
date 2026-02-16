@@ -41,7 +41,21 @@ app.add_middleware(
 
 @app.on_event("startup")
 def on_startup():
+    from database import engine
+    print(f"--- STARTUP DATABASE CHECK ---")
+    print(f"Database URL detected: {'YES' if os.getenv('DATABASE_URL') else 'NO'}")
+    print(f"Engine Dialect: {engine.dialect.name}")
+    print(f"-----------------------------")
     create_db_and_tables()
+    
+    # Auto-seed if SEED env var is set (for Railway)
+    if os.getenv("SEED", "false").lower() == "true":
+        from seed import seed_data
+        print("SEED env var found. Running seed_data()...")
+        try:
+            seed_data()
+        except Exception as e:
+            print(f"Error seeding data: {e}")
 
 # --- API Endpoints ---
 
