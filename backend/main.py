@@ -105,8 +105,25 @@ def delete_category(category_id: int, current_user: User = Depends(get_current_u
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
     session.delete(category)
+    session.delete(category)
     session.commit()
-    return {"ok": True}
+    return {"message": "Category deleted"}
+
+@app.put("/api/categories/{category_id}")
+def update_category(category_id: int, category_data: Category, current_user: User = Depends(get_current_user), session: Session = Depends(get_session)):
+    category = session.get(Category, category_id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
+    category.name = category_data.name
+    category.name_fa = category_data.name_fa
+    category.slug = category_data.slug
+    
+    session.add(category)
+    session.commit()
+    session.refresh(category)
+    session.refresh(category)
+    return category
 
 @app.post("/api/items")
 def create_menu_item(item: MenuItem, current_user: User = Depends(get_current_user), session: Session = Depends(get_session)):

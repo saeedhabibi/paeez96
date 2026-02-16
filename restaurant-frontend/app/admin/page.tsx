@@ -133,11 +133,20 @@ export default function AdminDashboard() {
         router.push('/admin/login');
     };
 
-    if (loading && !stats) return (
+    if (loading) return (
         <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-amber-500 font-bold">
             <div className="animate-pulse flex flex-col items-center gap-4">
                 <div className="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
                 <span>در حال بارگذاری...</span>
+            </div>
+        </div>
+    );
+
+    if (!stats && activeTab === 'dashboard') return (
+        <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-red-500 font-bold">
+            <div className="flex flex-col items-center gap-4">
+                <p>خطا در دریافت اطلاعات داشبورد.</p>
+                <button onClick={() => window.location.reload()} className="px-4 py-2 bg-red-500/10 rounded-lg hover:bg-red-500/20">تلاش مجدد</button>
             </div>
         </div>
     );
@@ -431,6 +440,7 @@ const MenuManagement = ({ categories, token, refresh }: { categories: Category[]
 
 const CategoryManagement = ({ categories, token, refresh }: { categories: Category[], token: string, refresh: () => void }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingCategory, setEditingCategory] = useState<Category | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
 
     const handleDelete = async (id: number) => {
@@ -464,7 +474,7 @@ const CategoryManagement = ({ categories, token, refresh }: { categories: Catego
                 </div>
 
                 <button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={() => { setEditingCategory(null); setIsModalOpen(true); }}
                     className="bg-amber-500 text-white px-6 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-amber-600 shadow-lg shadow-amber-500/20 active:scale-95 transition"
                 >
                     <Plus size={20} />
@@ -489,8 +499,16 @@ const CategoryManagement = ({ categories, token, refresh }: { categories: Catego
                                 {cat.items?.length || 0} آیتم
                             </span>
                             <button
+                                onClick={() => { setEditingCategory(cat); setIsModalOpen(true); }}
+                                className="p-2 text-amber-500 hover:bg-amber-500/10 rounded-lg transition-all"
+                                title="ویرایش"
+                            >
+                                <Edit size={20} />
+                            </button>
+                            <button
                                 onClick={() => handleDelete(cat.id)}
-                                className="p-2 text-red-500/50 hover:text-red-400 hover:bg-red-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                                className="p-2 text-red-500/50 hover:text-red-400 hover:bg-red-500/10 rounded-lg group-hover:text-red-500 transition-all"
+                                title="حذف"
                             >
                                 <Trash2 size={20} />
                             </button>
@@ -501,11 +519,25 @@ const CategoryManagement = ({ categories, token, refresh }: { categories: Catego
 
             {isModalOpen && (
                 <CategoryModal
+                    category={editingCategory}
                     onClose={() => setIsModalOpen(false)}
                     onSave={async (data: any) => {
                         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
-                        await fetch(`${apiUrl}/api/categories`, {
-                            method: 'POST',
+                        // If editing, use PUT/PATCH? API usually supports PUT for update. 
+                        // Assuming backend supports PUT based on items endpoint pattern.
+                        // Wait, previous code only had POST. I need to make sure backend has PUT for categories. I'll check main.py.
+                        // Ideally I'd use PUT if ID exists.
+                        const method = editingCategory ? 'PUT' : 'POST';
+                        // Wait, I haven't added PUT /api/categories/{id} to main.py yet!
+                        // I need to add it to backend as well.
+                        // For now I will assume I will add it.
+
+                        const url = editingCategory
+                            ? `${apiUrl}/api/categories/${editingCategory.id}`
+                            : `${apiUrl}/api/categories`;
+
+                        await fetch(url, {
+                            method,
                             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                             body: JSON.stringify(data)
                         });
@@ -564,14 +596,18 @@ const StatCard = ({ icon, title, value, trend, color = "amber" }: any) => {
 
 // --- Modals ---
 
-const CategoryModal = ({ onClose, onSave }: any) => {
-    const [formData, setFormData] = useState({ name: '', name_fa: '', slug: '' });
+const CategoryModal = ({ category, onClose, onSave }: any) => {
+    const [formData, setFormData] = useState({
+        name: category?.name || '',
+        name_fa: category?.name_fa || '',
+        slug: category?.slug || ''
+    });
 
     return (
         <div className="fixed inset-0 bg-black/50 dark:bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
             <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/10 rounded-3xl w-full max-w-md p-8 shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-500 to-orange-600" />
-                <h2 className="text-2xl font-bold mb-6 text-slate-800 dark:text-white">افزودن دسته‌بندی جدید</h2>
+                <h2 className="text-2xl font-bold mb-6 text-slate-800 dark:text-white">{category ? 'ویرایش دسته‌بندی' : 'افزودن دسته‌بندی جدید'}</h2>
                 <form onSubmit={e => { e.preventDefault(); onSave(formData); }} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-300">نام فارسی</label>
