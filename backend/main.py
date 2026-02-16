@@ -176,16 +176,20 @@ def delete_menu_item(item_id: int, current_user: User = Depends(get_current_user
 
 @app.get("/api/stats")
 def get_stats(current_user: User = Depends(get_current_user), session: Session = Depends(get_session)):
+    print(f"DEBUG: get_stats called for user: {current_user.username}")
+    
     # 1. Total Counts
     total_items = session.exec(select(MenuItem)).all()
     total_categories = session.exec(select(Category)).all()
+    print(f"DEBUG: Found {len(total_items)} items, {len(total_categories)} categories")
     
     # 2. Daily Stats (Last 7 days)
-    # Since we can't easily query date ranges with string dates in sqlite efficiently without deeper logic,
-    # we'll just fetch all or last 30 and filter in python for now (low scale)
     stats = session.exec(select(DailyStat)).all()
+    print(f"DEBUG: Raw stats from DB: {stats}")
+    
     # Sort by date
     stats = sorted(stats, key=lambda x: x.date)
+    print(f"DEBUG: Sorted stats: {stats}")
     
     return {
         "total_items": len(total_items),
