@@ -87,12 +87,14 @@ export default function PaeezRestaurant() {
   // Fetch Menu
   useEffect(() => {
     // Track visit
-    fetch('http://127.0.0.1:8000/api/track-visit', { method: 'POST' })
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+    fetch(`${apiUrl}/api/track-visit`, { method: 'POST' })
       .catch(err => console.error('Failed to track visit', err));
 
     const fetchMenu = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:8000/api/menu');
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+        const res = await fetch(`${apiUrl}/api/menu`);
         if (!res.ok) throw new Error('API Error');
         const rawData = await res.json();
 

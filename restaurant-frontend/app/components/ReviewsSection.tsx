@@ -20,7 +20,8 @@ export default function ReviewsSection() {
         const fetchReviews = async () => {
             // In a real app setup, use your actual API URL
             try {
-                const res = await fetch('http://127.0.0.1:8000/api/reviews');
+                const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+                const res = await fetch(`${apiUrl}/api/reviews`);
                 if (res.ok) {
                     const data = await res.json();
                     setReviews(data);

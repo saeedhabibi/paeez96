@@ -28,6 +28,8 @@ origins = [
     "http://127.0.0.1:3000",
     "https://paeez96.vercel.app",  # Example Vercel domain
     "https://*.up.railway.app",    # Railway domains
+    "https://paeez96.ir",
+    "https://www.paeez96.ir",
     "*",                           # Allow all for now during setup (safer to restrict later)
 ]
 
