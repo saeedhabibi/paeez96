@@ -115,7 +115,7 @@ export default function AdminDashboard() {
         try {
             setLoading(true);
             setErrorMsg(null);
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://paeez96-production.up.railway.app';
             console.log('Fetching data from:', apiUrl);
 
             const [menuRes, statsRes] = await Promise.all([
@@ -258,7 +258,7 @@ export default function AdminDashboard() {
                             <div className="flex flex-col items-center gap-4 text-center">
                                 <p className="text-xl">خطا در دریافت اطلاعات</p>
                                 <p className="text-sm font-mono bg-red-50 dark:bg-white/5 p-2 rounded dir-ltr">{errorMsg}</p>
-                                <p className="text-xs text-slate-500">API: {process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}</p>
+                                <p className="text-xs text-slate-500">API: {process.env.NEXT_PUBLIC_API_URL || 'https://paeez96-production.up.railway.app'}</p>
                                 <button onClick={() => window.location.reload()} className="px-4 py-2 bg-red-500/10 rounded-lg hover:bg-red-500/20 mt-2">تلاش مجدد</button>
                                 <button onClick={handleLogout} className="text-sm text-slate-500 hover:text-red-500 mt-2">خروج و ورود مجدد</button>
                             </div>
@@ -735,22 +735,23 @@ const ItemModal = ({ item, categories, onClose, onSave }: any) => {
                                 onChange={e => setFormData({ ...formData, image_url: e.target.value })}
                                 placeholder="https://..."
                             />
-                        <div className="col-span-1 md:col-span-2">
-                            <label className="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-300">تصویر</label>
-                            <ImageUploader 
+                            <ImageUploader
                                 value={formData.image_url || ''}
                                 onChange={(url) => setFormData({ ...formData, image_url: url })}
                             />
-                        </div>
+                            <div className="mt-2 text-right">
+                                <a
+                                    href="https://imgbb.com"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-xs font-bold text-amber-500 hover:underline flex items-center gap-1"
+                                    className="text-xs font-bold text-amber-500 hover:underline inline-flex items-center gap-1"
                                 >
                                     آپلود رایگان عکس (ImgBB)
                                     <ExternalLink size={10} />
                                 </a>
                             </div>
                         </div>
+
                         <div className="col-span-1 md:col-span-2">
                             <label className="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-300">توضیحات</label>
                             <textarea
