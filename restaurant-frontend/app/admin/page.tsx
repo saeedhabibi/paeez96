@@ -90,6 +90,8 @@ export default function AdminDashboard() {
     // Modals & Forms
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
     useEffect(() => {
         const storedToken = localStorage.getItem('token');
         if (!storedToken) {
@@ -112,7 +114,10 @@ export default function AdminDashboard() {
     const fetchData = async (authToken: string) => {
         try {
             setLoading(true);
+            setErrorMsg(null);
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+            console.log('Fetching data from:', apiUrl);
+
             const [menuRes, statsRes] = await Promise.all([
                 fetch(`${apiUrl}/api/menu`),
                 fetch(`${apiUrl}/api/stats`, {
@@ -120,10 +125,16 @@ export default function AdminDashboard() {
                 })
             ]);
 
-            if (menuRes.ok) setCategories(await menuRes.json());
-            if (statsRes.ok) setStats(await statsRes.json());
-        } catch (error) {
+            if (!menuRes.ok) throw new Error(`Menu API failed: ${menuRes.status}`);
+            if (!statsRes.ok) throw new Error(`Stats API failed: ${statsRes.status} (Auth Token may be invalid)`);
+
+            setCategories(await menuRes.json());
+            const statsData = await statsRes.json();
+            console.log('Stats Data:', statsData);
+            setStats(statsData);
+        } catch (error: any) {
             console.error('Failed to fetch data', error);
+            setErrorMsg(error.message || 'Unknown error');
         } finally {
             setLoading(false);
         }
@@ -242,12 +253,14 @@ export default function AdminDashboard() {
                     )}
 
                     {/* Error State */}
-                    {!loading && !stats && activeTab === 'dashboard' && (
+                    {!loading && (errorMsg || (!stats && activeTab === 'dashboard')) && (
                         <div className="flex-1 flex items-center justify-center min-h-[400px] text-red-500 font-bold">
-                            <div className="flex flex-col items-center gap-4">
-                                <p>خطا در دریافت اطلاعات داشبورد.</p>
-                                <button onClick={() => window.location.reload()} className="px-4 py-2 bg-red-500/10 rounded-lg hover:bg-red-500/20">تلاش مجدد</button>
-                                <p className="text-xs text-slate-500 font-normal mt-2">ممکن است نیاز به ورود مجدد باشد.</p>
+                            <div className="flex flex-col items-center gap-4 text-center">
+                                <p className="text-xl">خطا در دریافت اطلاعات</p>
+                                <p className="text-sm font-mono bg-red-50 dark:bg-white/5 p-2 rounded dir-ltr">{errorMsg}</p>
+                                <p className="text-xs text-slate-500">API: {process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}</p>
+                                <button onClick={() => window.location.reload()} className="px-4 py-2 bg-red-500/10 rounded-lg hover:bg-red-500/20 mt-2">تلاش مجدد</button>
+                                <button onClick={handleLogout} className="text-sm text-slate-500 hover:text-red-500 mt-2">خروج و ورود مجدد</button>
                             </div>
                         </div>
                     )}
