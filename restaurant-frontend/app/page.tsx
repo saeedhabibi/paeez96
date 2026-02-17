@@ -5,7 +5,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import {
   Phone, MapPin, Clock, Search, Share2, Save, Globe, Star, X,
-  Flame, Info, Navigation, MessageSquare, ExternalLink, Check
+  Flame, Info, Navigation, MessageSquare, ExternalLink, Check, Sun, Moon
 } from 'lucide-react';
 
 // ----------------------------------------------------------------------
@@ -58,6 +58,26 @@ type Lang = 'en' | 'fa';
 
 export default function PaeezRestaurant() {
   const [lang, setLang] = useState<Lang>('fa');
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Theme Logic
+  useEffect(() => {
+    const storedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const shouldBeDark = storedTheme === 'dark' || (!storedTheme && prefersDark);
+
+    setIsDarkMode(shouldBeDark);
+    if (shouldBeDark) document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+  }, []);
+
+  const toggleTheme = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    localStorage.setItem('theme', newMode ? 'dark' : 'light');
+    if (newMode) document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+  };
   const [menuData, setMenuData] = useState<MenuData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<number>(0);
@@ -213,7 +233,7 @@ export default function PaeezRestaurant() {
   return (
     <div
       dir={isRTL ? 'rtl' : 'ltr'}
-      className={`min-h-screen bg-[#F8F9FB] text-gray-900 pb-20 font-sans ${isRTL ? 'font-[family-name:var(--font-vazir)]' : 'font-[family-name:var(--font-inter)]'}`}
+      className={`min-h-screen bg-[#F8F9FB] dark:bg-slate-950 text-gray-900 dark:text-gray-100 pb-20 font-sans ${isRTL ? 'font-[family-name:var(--font-vazir)]' : 'font-[family-name:var(--font-inter)]'}`}
     >
       <Toast visible={isCopied} message={t.copied} />
 
@@ -221,18 +241,76 @@ export default function PaeezRestaurant() {
         lang={lang}
         onToggleLang={() => setLang(l => l === 'en' ? 'fa' : 'en')}
         isRTL={isRTL}
+        isDarkMode={isDarkMode}
+        toggleTheme={toggleTheme}
       />
 
-      <ProfileCard
-        t={t}
-        isRTL={isRTL}
-        isOpen={isOpen}
-        onInfoClick={() => setShowRestaurantInfo(true)}
-        onNavigate={handleNavigate}
-        onCall={handleCall}
-        onSave={handleSaveContact}
-        onShare={handleShare}
-      />
+      <div className="relative px-4 -mt-24 z-20 cursor-pointer" onClick={() => setShowRestaurantInfo(true)}>
+        <div className="bg-white dark:bg-slate-900/80 dark:backdrop-blur-md dark:border dark:border-white/10 rounded-[45px] p-6 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] active:scale-[0.98] transition-all duration-200">
+          <div className="flex justify-between items-start mb-6">
+            <div className={`
+              w-[88px] h-[88px] bg-slate-900 dark:bg-white rounded-[28px] text-white dark:text-slate-900
+              flex flex-col items-center justify-center shadow-2xl
+              transform rotate-3 origin-center
+              ${isRTL ? '-ml-2' : '-mr-2'}
+            `}>
+              <span className="text-[9px] font-medium tracking-widest opacity-60 mb-0.5">{t.est}</span>
+              <span className="text-2xl font-black tracking-tighter leading-none">96</span>
+              <span className="text-[10px] font-bold mt-1 uppercase tracking-wider">Paeez</span>
+            </div>
+
+            <div className={`flex flex-col ${isRTL ? 'items-start' : 'items-end'}`}>
+              <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full mb-2 ${isOpen ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400' : 'bg-red-50 text-red-700 dark:bg-red-500/20 dark:text-red-400'}`}>
+                <span className="relative flex h-2 w-2">
+                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isOpen ? 'bg-emerald-400' : 'bg-red-400'}`}></span>
+                  <span className={`relative inline-flex rounded-full h-2 w-2 ${isOpen ? 'bg-emerald-500' : 'bg-red-500'}`}></span>
+                </span>
+                <span className="text-xs font-bold">{isOpen ? t.openStatus : t.closedStatus}</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-slate-400 text-xs font-medium">
+                <Clock size={12} />
+                <span>{t.hours}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mb-8">
+            <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2 leading-none">{t.title}</h1>
+            <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">{t.subtitle}</p>
+          </div>
+
+          <div className="space-y-4 mb-8">
+            <div className="flex items-start gap-4 group" onClick={(e) => { e.stopPropagation(); handleNavigate(); }}>
+              <div className="w-10 h-10 rounded-full bg-slate-50 dark:bg-white/10 flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300 group-hover:bg-slate-900 dark:group-hover:bg-white group-hover:text-white dark:group-hover:text-slate-900 transition-colors">
+                <MapPin size={18} />
+              </div>
+              <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 leading-snug pt-2">{t.address}</p>
+            </div>
+            <div className="flex items-center gap-4 group" onClick={(e) => { e.stopPropagation(); handleCall(); }}>
+              <div className="w-10 h-10 rounded-full bg-slate-50 dark:bg-white/10 flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300 group-hover:bg-slate-900 dark:group-hover:bg-white group-hover:text-white dark:group-hover:text-slate-900 transition-colors">
+                <Phone size={18} />
+              </div>
+              <p className="text-sm font-semibold text-slate-700 dark:text-slate-300" dir="ltr">{CONFIG.phone}</p>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              className="flex-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 h-14 rounded-[20px] flex items-center justify-center gap-2 font-bold text-sm shadow-lg active:scale-95 transition-transform"
+              onClick={(e) => { e.stopPropagation(); handleSaveContact(); }}
+            >
+              <Save size={18} />
+              {t.btnSave}
+            </button>
+            <button
+              className="w-14 h-14 bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white rounded-[20px] flex items-center justify-center shadow-sm active:scale-95 transition-transform"
+              onClick={(e) => { e.stopPropagation(); handleShare(); }}
+            >
+              <Share2 size={20} />
+            </button>
+          </div>
+        </div>
+      </div>
 
       <StickyNav
         t={t}
@@ -291,7 +369,7 @@ const Toast = ({ visible, message }: { visible: boolean; message: string }) => {
   );
 };
 
-const HeroSection = ({ lang, onToggleLang, isRTL }: { lang: Lang, onToggleLang: () => void, isRTL: boolean }) => (
+const HeroSection = ({ lang, onToggleLang, isRTL, isDarkMode, toggleTheme }: { lang: Lang, onToggleLang: () => void, isRTL: boolean, isDarkMode: boolean, toggleTheme: () => void }) => (
   <header className="relative w-full h-[320px]">
     <Image
       src={CONFIG.heroImage}
@@ -301,16 +379,27 @@ const HeroSection = ({ lang, onToggleLang, isRTL }: { lang: Lang, onToggleLang: 
       priority
     />
     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-    <button
-      onClick={onToggleLang}
-      className={`absolute top-6 ${isRTL ? 'left-6' : 'right-6'} z-30
-        flex items-center gap-2 px-4 py-2.5 rounded-full
+
+    <div className={`absolute top-6 ${isRTL ? 'left-6' : 'right-6'} z-30 flex gap-3`}>
+      <button
+        onClick={toggleTheme}
+        className="flex items-center justify-center w-10 h-10 rounded-full
         bg-white/10 backdrop-blur-xl border border-white/20
-        text-white font-bold text-sm tracking-wide hover:bg-white/20 transition-all`}
-    >
-      <Globe size={16} />
-      <span>{lang === 'en' ? 'FA' : 'EN'}</span>
-    </button>
+        text-white hover:bg-white/20 transition-all"
+      >
+        {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+      </button>
+
+      <button
+        onClick={onToggleLang}
+        className="flex items-center gap-2 px-4 py-2.5 rounded-full
+        bg-white/10 backdrop-blur-xl border border-white/20
+        text-white font-bold text-sm tracking-wide hover:bg-white/20 transition-all"
+      >
+        <Globe size={16} />
+        <span>{lang === 'en' ? 'FA' : 'EN'}</span>
+      </button>
+    </div>
   </header>
 );
 
@@ -384,7 +473,7 @@ const ProfileCard = ({ t, isRTL, isOpen, onInfoClick, onNavigate, onCall, onSave
 );
 
 const StickyNav = ({ t, isRTL, searchQuery, onSearchChange, categories, activeCategory, onCategoryClick }: any) => (
-  <div className="sticky top-0 z-40 bg-[#F8F9FB]/95 backdrop-blur-md pt-6 pb-2 border-b border-slate-200/50">
+  <div className="sticky top-0 z-40 bg-[#F8F9FB]/95 dark:bg-slate-950/95 backdrop-blur-md pt-6 pb-2 border-b border-slate-200/50 dark:border-white/5">
     <div className="px-5 mb-4">
       <div className="relative">
         <input
@@ -392,9 +481,9 @@ const StickyNav = ({ t, isRTL, searchQuery, onSearchChange, categories, activeCa
           placeholder={t.search}
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className={`w-full h-14 bg-white rounded-[24px] shadow-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 transition-shadow ${isRTL ? 'pr-12 pl-4' : 'pl-12 pr-4'}`}
+          className={`w-full h-14 bg-white dark:bg-slate-900 dark:text-white rounded-[24px] shadow-sm text-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-white/10 transition-shadow ${isRTL ? 'pr-12 pl-4' : 'pl-12 pr-4'}`}
         />
-        <Search className={`absolute top-1/2 -translate-y-1/2 text-slate-400 ${isRTL ? 'right-4' : 'left-4'}`} size={20} />
+        <Search className={`absolute top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 ${isRTL ? 'right-4' : 'left-4'}`} size={20} />
       </div>
     </div>
 
@@ -404,7 +493,7 @@ const StickyNav = ({ t, isRTL, searchQuery, onSearchChange, categories, activeCa
           <button
             key={cat.id}
             onClick={() => onCategoryClick(cat.id)}
-            className={`snap-start shrink-0 px-6 py-3 rounded-full text-sm font-bold whitespace-nowrap transition-all duration-300 ${activeCategory === cat.id ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20 scale-105' : 'bg-white text-slate-600 shadow-sm border border-slate-100 hover:bg-slate-50'}`}
+            className={`snap-start shrink-0 px-6 py-3 rounded-full text-sm font-bold whitespace-nowrap transition-all duration-300 ${activeCategory === cat.id ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg shadow-slate-900/20 scale-105' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 shadow-sm border border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
           >
             {isRTL ? cat.title_fa : cat.title_en}
           </button>
@@ -427,11 +516,11 @@ const MenuGrid = ({ loading, categories, isRTL, t, onItemClick }: any) => (
       categories.map((category: Category) => (
         <div key={category.id} id={`cat-${category.id}`} className="scroll-mt-48">
           <div className="flex items-center gap-4 mb-6 px-2">
-            <h2 className="text-2xl font-black text-slate-800 tracking-tight">{isRTL ? category.title_fa : category.title_en}</h2>
-            <div className="h-px bg-slate-200 flex-1"></div>
+            <h2 className="text-2xl font-black text-slate-800 dark:text-slate-200 tracking-tight">{isRTL ? category.title_fa : category.title_en}</h2>
+            <div className="h-px bg-slate-200 dark:bg-slate-800 flex-1"></div>
           </div>
           <div className="space-y-6">
-            {category.items?.map((item) => (
+            {category.items?.map((item: any) => (
               <MenuItemCard key={item.id} item={item} isRTL={isRTL} t={t} onClick={() => onItemClick(item)} />
             ))}
           </div>
@@ -452,7 +541,7 @@ const MenuItemCard = ({ item, isRTL, t, onClick }: any) => {
 
   return (
     <div className="group relative cursor-pointer" onClick={onClick}>
-      <div className="relative h-[280px] w-full rounded-[45px] overflow-hidden shadow-lg bg-white">
+      <div className="relative h-[280px] w-full rounded-[45px] overflow-hidden shadow-lg bg-white dark:bg-slate-900">
         <Image src={item.image_url} alt={isRTL ? item.name_fa : item.name_en} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
 
@@ -474,15 +563,15 @@ const MenuItemCard = ({ item, isRTL, t, onClick }: any) => {
         )}
       </div>
       <div className="px-4 pt-4 pb-2">
-        <h3 className="text-xl font-bold text-slate-900 leading-tight">{isRTL ? item.name_fa : item.name_en}</h3>
-        <p className="text-slate-500 text-sm font-medium leading-relaxed line-clamp-2">{isRTL ? item.description_fa : item.description_en}</p>
+        <h3 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">{isRTL ? item.name_fa : item.name_en}</h3>
+        <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed line-clamp-2">{isRTL ? item.description_fa : item.description_en}</p>
       </div>
     </div>
   );
 };
 
 const Footer = () => (
-  <div className="mt-12 py-8 text-center text-slate-400 text-xs font-medium border-t border-slate-200 mx-8">
+  <div className="mt-12 py-8 text-center text-slate-400 dark:text-slate-600 text-xs font-medium border-t border-slate-200 dark:border-white/5 mx-8">
     <p>© 2026 PAEEZ 96 RESTURANT</p>
     <p className="mt-1">DESIGNED & DEVELOPED BY SAEED HABIBI</p>
   </div>
@@ -493,7 +582,7 @@ const Footer = () => (
 const BaseModal = ({ onClose, children }: { onClose: () => void, children: React.ReactNode }) => (
   <>
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 transition-opacity duration-300" onClick={onClose} />
-    <div className={`fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-[45px] shadow-[0_-10px_40px_rgba(0,0,0,0.2)] transform transition-transform duration-300 ease-out max-h-[95vh] overflow-y-auto no-scrollbar`} style={{ animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+    <div className={`fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 dark:text-white rounded-t-[45px] shadow-[0_-10px_40px_rgba(0,0,0,0.2)] transform transition-transform duration-300 ease-out max-h-[95vh] overflow-y-auto no-scrollbar`} style={{ animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}>
       {children}
     </div>
     <style jsx global>{`
@@ -521,43 +610,43 @@ const ItemDetailModal = ({ item, onClose, isRTL, t }: any) => {
       </button>
       <div className="relative h-[300px] w-full">
         <Image src={item.image_url} alt={isRTL ? item.name_fa : item.name_en} fill className="object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-slate-900 via-transparent to-transparent" />
       </div>
       <div className="px-8 pb-8 -mt-12 relative">
         <div className="flex justify-between items-start mb-4">
-          <h2 className="text-3xl font-black text-slate-900 leading-none w-3/4">{isRTL ? item.name_fa : item.name_en}</h2>
+          <h2 className="text-3xl font-black text-slate-900 dark:text-white leading-none w-3/4">{isRTL ? item.name_fa : item.name_en}</h2>
           {showPrice ? (
-            <div className="text-xl font-bold text-slate-900 bg-slate-100 px-3 py-1.5 rounded-xl">{formatPrice(item.price)}</div>
+            <div className="text-xl font-bold text-slate-900 bg-slate-100 dark:bg-white/10 dark:text-white px-3 py-1.5 rounded-xl">{formatPrice(item.price)}</div>
           ) : (
-            <div className="text-xl font-bold text-slate-900 bg-slate-100 px-3 py-1.5 rounded-xl">{isRTL ? 'ناموجود' : 'Sold Out'}</div>
+            <div className="text-xl font-bold text-slate-900 bg-slate-100 dark:bg-white/10 dark:text-white px-3 py-1.5 rounded-xl">{isRTL ? 'ناموجود' : 'Sold Out'}</div>
           )}
         </div>
-        <p className="text-slate-500 font-medium leading-relaxed mb-6">{isRTL ? item.description_fa : item.description_en}</p>
+        <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed mb-6">{isRTL ? item.description_fa : item.description_en}</p>
         <div className="flex gap-4 mb-8 overflow-x-auto no-scrollbar">
           {item.calories && (
-            <div className="px-4 py-3 bg-orange-50 text-orange-700 rounded-2xl flex items-center gap-2 shrink-0">
+            <div className="px-4 py-3 bg-orange-50 dark:bg-orange-500/20 text-orange-700 dark:text-orange-300 rounded-2xl flex items-center gap-2 shrink-0">
               <Flame size={18} />
               <span className="font-bold text-sm">{item.calories} {t.calories}</span>
             </div>
           )}
           {item.time && (
-            <div className="px-4 py-3 bg-blue-50 text-blue-700 rounded-2xl flex items-center gap-2 shrink-0">
+            <div className="px-4 py-3 bg-blue-50 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 rounded-2xl flex items-center gap-2 shrink-0">
               <Clock size={18} />
               <span className="font-bold text-sm">{item.time} {t.min}</span>
             </div>
           )}
           {item.rating && (
-            <div className="px-4 py-3 bg-yellow-50 text-yellow-700 rounded-2xl flex items-center gap-2 shrink-0">
+            <div className="px-4 py-3 bg-yellow-50 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 rounded-2xl flex items-center gap-2 shrink-0">
               <Star size={18} fill="currentColor" />
               <span className="font-bold text-sm">{item.rating}</span>
             </div>
           )}
         </div>
         <div className="mb-24">
-          <h3 className="font-bold text-slate-900 mb-3 flex items-center gap-2"><Info size={16} />{t.ingredients}</h3>
+          <h3 className="font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2"><Info size={16} />{t.ingredients}</h3>
           <div className="flex flex-wrap gap-2">
             {(isRTL ? item.ingredients_fa : item.ingredients_en)?.map((ing: string, i: number) => (
-              <span key={i} className="px-3 py-1.5 border border-slate-200 text-slate-600 rounded-full text-xs font-semibold">{ing}</span>
+              <span key={i} className="px-3 py-1.5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 rounded-full text-xs font-semibold">{ing}</span>
             )) || <span className="text-slate-400 text-sm">-</span>}
           </div>
         </div>
@@ -573,12 +662,12 @@ const RestaurantInfoModal = ({ onClose, isRTL, t, isOpen, onCall, onNavigate }: 
     </button>
     <div className="relative h-[250px] w-full">
       <Image src={CONFIG.heroImage} alt="Paeez 96" fill className="object-cover" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#F8F9FB] via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#F8F9FB] dark:from-slate-950 via-transparent to-transparent" />
     </div>
 
-    <div className="px-8 pb-8 -mt-12 relative bg-[#F8F9FB]">
-      <h2 className="text-3xl font-black text-slate-900 mb-2">{t.aboutTitle}</h2>
-      <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl mb-6 ${isOpen ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}`}>
+    <div className="px-8 pb-8 -mt-12 relative bg-[#F8F9FB] dark:bg-slate-950">
+      <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2">{t.aboutTitle}</h2>
+      <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl mb-6 ${isOpen ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400' : 'bg-red-50 text-red-700 dark:bg-red-500/20 dark:text-red-400'}`}>
         <span className={`w-2.5 h-2.5 rounded-full ${isOpen ? 'bg-emerald-500' : 'bg-red-500'}`}></span>
         <span className="font-bold text-sm">{isOpen ? t.openStatus : t.closedStatus}</span>
         {!isOpen && <span className="text-xs opacity-80 ml-1">({t.opensAt})</span>}
@@ -586,16 +675,16 @@ const RestaurantInfoModal = ({ onClose, isRTL, t, isOpen, onCall, onNavigate }: 
 
       <div className="space-y-6 mb-8">
         <div>
-          <h3 className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">{t.workingHours}</h3>
-          <p className="text-slate-800 font-bold text-lg">{t.hours}</p>
+          <h3 className="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">{t.workingHours}</h3>
+          <p className="text-slate-800 dark:text-white font-bold text-lg">{t.hours}</p>
         </div>
         <div>
-          <h3 className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">{t.address}</h3>
-          <p className="text-slate-800 font-medium leading-relaxed">{t.address}</p>
+          <h3 className="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">{t.address}</h3>
+          <p className="text-slate-800 dark:text-white font-medium leading-relaxed">{t.address}</p>
         </div>
       </div>
 
-      <div className="w-full h-[200px] bg-slate-100 rounded-[30px] overflow-hidden mb-8 relative shadow-inner cursor-pointer" onClick={onNavigate}>
+      <div className="w-full h-[200px] bg-slate-100 dark:bg-white/5 rounded-[30px] overflow-hidden mb-8 relative shadow-inner cursor-pointer" onClick={onNavigate}>
         <iframe
           src="https://maps.google.com/maps?q=Paeez+96+Restaurant,+Bandar+Anzali&t=&z=15&ie=UTF8&iwloc=&output=embed"
           width="100%" height="100%" style={{ border: 0, pointerEvents: 'none' }} allowFullScreen loading="lazy"
@@ -605,25 +694,25 @@ const RestaurantInfoModal = ({ onClose, isRTL, t, isOpen, onCall, onNavigate }: 
       </div>
 
       <div className="flex gap-3 mb-12">
-        <button className="flex-1 bg-slate-900 text-white h-14 rounded-[20px] flex items-center justify-center gap-2 font-bold text-sm shadow-lg active:scale-95 transition-transform" onClick={onCall}>
+        <button className="flex-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 h-14 rounded-[20px] flex items-center justify-center gap-2 font-bold text-sm shadow-lg active:scale-95 transition-transform" onClick={onCall}>
           <Phone size={18} />{t.callNow}
         </button>
-        <button className="flex-1 bg-white text-slate-900 h-14 rounded-[20px] flex items-center justify-center gap-2 font-bold text-sm border border-slate-200 active:scale-95 transition-transform" onClick={onNavigate}>
+        <button className="flex-1 bg-white dark:bg-white/10 text-slate-900 dark:text-white h-14 rounded-[20px] flex items-center justify-center gap-2 font-bold text-sm border border-slate-200 dark:border-white/10 active:scale-95 transition-transform" onClick={onNavigate}>
           <Navigation size={18} />{t.navigate}
         </button>
       </div>
 
       {/* Reviews */}
-      <div className="pt-4 border-t border-slate-200">
+      <div className="pt-4 border-t border-slate-200 dark:border-white/5">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
+            <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
               <MessageSquare size={20} className="text-slate-400" />
               {t.reviews}
             </h3>
-            <p className="text-slate-500 text-xs font-medium">{t.basedOn}</p>
+            <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">{t.basedOn}</p>
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-yellow-50 text-yellow-700 rounded-xl">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-yellow-50 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 rounded-xl">
             <Star size={16} fill="currentColor" />
             <span className="font-black text-sm">4.8</span>
           </div>
@@ -631,14 +720,14 @@ const RestaurantInfoModal = ({ onClose, isRTL, t, isOpen, onCall, onNavigate }: 
 
         <div className="space-y-4 mb-10">
           {MOCK_REVIEWS.map((review) => (
-            <div key={review.id} className="bg-white p-5 rounded-[28px] border border-slate-100 shadow-sm">
+            <div key={review.id} className="bg-white dark:bg-white/5 p-5 rounded-[28px] border border-slate-100 dark:border-white/5 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs">
+                  <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-500 dark:text-white font-bold text-xs">
                     {review.avatar}
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-slate-900">{review.user}</h4>
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">{review.user}</h4>
                     <p className="text-[10px] text-slate-400 font-medium">{isRTL ? review.date_fa : review.date_en}</p>
                   </div>
                 </div>
@@ -648,14 +737,14 @@ const RestaurantInfoModal = ({ onClose, isRTL, t, isOpen, onCall, onNavigate }: 
                   ))}
                 </div>
               </div>
-              <p className="text-slate-600 text-xs font-medium leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 text-xs font-medium leading-relaxed">
                 {isRTL ? review.comment_fa : review.comment_en}
               </p>
             </div>
           ))}
         </div>
 
-        <button className="w-full py-4 rounded-[20px] border border-slate-200 text-slate-600 font-bold text-sm flex items-center justify-center gap-2 hover:bg-white transition-colors" onClick={onNavigate}>
+        <button className="w-full py-4 rounded-[20px] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 font-bold text-sm flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-white/5 transition-colors" onClick={onNavigate}>
           {t.viewMore}
           <ExternalLink size={16} />
         </button>
@@ -692,10 +781,10 @@ const MOCK_REVIEWS: Review[] = [
 
 const CONTENT = {
   en: {
-    title: "Paeez 96", subtitle: "Premium Dining • Lounge", address: "Mellat Bank, Ghazian, Bandar Anzali", openStatus: "Open Now", closedStatus: "Closed Now", hours: "12:00 PM - 12:00 AM", btnSave: "Save Contact", btnShare: "Share", search: "Search menu...", currency: "$", currencySuffix: "", popular: "Popular", loading: "Loading Menu...", menuTitle: "Our Menu", addToOrder: "Add to Order", ingredients: "Ingredients", calories: "Calories", min: "min", noResults: "No items found.", aboutTitle: "About Paeez 96", callNow: "Call Now", navigate: "Navigate", workingHours: "Working Hours", opensAt: "Opens at 12:00 PM", reviews: "Google Reviews", basedOn: "Based on 450+ reviews", viewMore: "View on Google Maps", copied: "Link copied!"
+    title: "Paeez 96", subtitle: "Premium Dining • Lounge", address: "Mellat Bank, Ghazian, Bandar Anzali", openStatus: "Open Now", closedStatus: "Closed Now", hours: "12:00 PM - 12:00 AM", btnSave: "Save Contact", btnShare: "Share", search: "Search menu...", currency: "$", currencySuffix: "", popular: "Popular", loading: "Loading Menu...", menuTitle: "Our Menu", addToOrder: "Add to Order", ingredients: "Ingredients", calories: "Calories", min: "min", noResults: "No items found.", aboutTitle: "About Paeez 96", callNow: "Call Now", navigate: "Navigate", workingHours: "Working Hours", opensAt: "Opens at 12:00 PM", reviews: "Google Reviews", basedOn: "Based on 450+ reviews", viewMore: "View on Google Maps", copied: "Link copied!", est: "EST. 1996"
   },
   fa: {
-    title: "رستوران پاییز ۹۶", subtitle: "رستوران • کافه • لانژ", address: "بندر انزلی، غازیان، جنب بانک ملت ", openStatus: "اکنون باز است", closedStatus: "اکنون بسته است", hours: "۱۲:۰۰ ظهر - ۱۲:۰۰ شب", btnSave: "ذخیره تماس", btnShare: "اشتراک", search: "جستجو در منو...", currency: "", currencySuffix: "تومان", popular: "محبوب", loading: "در حال بارگذاری...", menuTitle: "منوی ما", addToOrder: "افزودن به سفارش", ingredients: "محتویات", calories: "کالری", min: "دقیقه", noResults: "موردی یافت نشد.", aboutTitle: "درباره پاییز ۹۶", callNow: "تماس بگیرید", navigate: "مسیریابی", workingHours: "ساعات کاری", opensAt: "ساعت ۱۲:۰۰ باز می‌شود", reviews: "نظرات گوگل مپ", basedOn: "بر اساس بیش از ۴۵۰ نظر", viewMore: "مشاهده در گوگل مپ", copied: "لینک کپی شد!"
+    title: "رستوران پاییز ۹۶", subtitle: "رستوران • کافه • لانژ", address: "بندر انزلی، غازیان، جنب بانک ملت ", openStatus: "اکنون باز است", closedStatus: "اکنون بسته است", hours: "۱۲:۰۰ ظهر - ۱۲:۰۰ شب", btnSave: "ذخیره تماس", btnShare: "اشتراک", search: "جستجو در منو...", currency: "", currencySuffix: "تومان", popular: "محبوب", loading: "در حال بارگذاری...", menuTitle: "منوی ما", addToOrder: "افزودن به سفارش", ingredients: "محتویات", calories: "کالری", min: "دقیقه", noResults: "موردی یافت نشد.", aboutTitle: "درباره پاییز ۹۶", callNow: "تماس بگیرید", navigate: "مسیریابی", workingHours: "ساعات کاری", opensAt: "ساعت ۱۲:۰۰ باز می‌شود", reviews: "نظرات گوگل مپ", basedOn: "بر اساس بیش از ۴۵۰ نظر", viewMore: "مشاهده در گوگل مپ", copied: "لینک کپی شد!", est: "تأسیس ۱۳۷۵"
   }
 };
 
