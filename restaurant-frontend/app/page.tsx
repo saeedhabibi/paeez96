@@ -7,6 +7,7 @@ import {
   Phone, MapPin, Clock, Search, Share2, Save, Globe, Star, X,
   Flame, Info, Navigation, MessageSquare, ExternalLink, Check, Sun, Moon
 } from 'lucide-react';
+import InstallPWA from './components/InstallPWA';
 
 // ----------------------------------------------------------------------
 // TYPES
@@ -236,6 +237,8 @@ export default function PaeezRestaurant() {
       className={`min-h-screen bg-[#F8F9FB] dark:bg-slate-950 text-gray-900 dark:text-gray-100 pb-20 font-sans ${isRTL ? 'font-[family-name:var(--font-vazir)]' : 'font-[family-name:var(--font-inter)]'}`}
     >
       <Toast visible={isCopied} message={t.copied} />
+
+      <InstallPWA lang={lang} />
 
       <HeroSection
         lang={lang}
