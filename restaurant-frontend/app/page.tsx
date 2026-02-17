@@ -670,7 +670,7 @@ const RestaurantInfoModal = ({ onClose, isRTL, t, isOpen, onCall, onNavigate }: 
 
 const CONFIG = {
   phone: "+989111851233",
-  heroImage: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1000&auto=format&fit=crop",
+  heroImage: "https://i.ibb.co/TqPZzjCJ/IMG-20260215-215945.jpg",
   mapsUrl: "https://www.google.com/maps/dir/?api=1&destination=Paeez+96+Restaurant+Bandar+Anzali",
   GET: "Atba Blvd, Ghazian, Bandar Anzali",
   addressEn: "Atba Blvd, Ghazian, Bandar Anzali",
