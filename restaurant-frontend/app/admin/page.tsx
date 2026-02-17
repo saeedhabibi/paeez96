@@ -767,12 +767,24 @@ const ItemModal = ({ item, categories, onClose, onSave }: any) => {
                             <input type="number" className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-800 dark:text-white focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500" value={formData.calories || 0} onChange={e => setFormData({ ...formData, calories: Number(e.target.value) })} />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-300">زمان آماده‌سازی (دقیقه)</label>
                             <input type="text" className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-800 dark:text-white focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500" value={formData.time || ''} onChange={e => setFormData({ ...formData, time: e.target.value })} />
                         </div>
                         <div>
                             <label className="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-300">امتیاز (۰ تا ۵)</label>
                             <input type="number" min="0" max="5" step="0.1" className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-800 dark:text-white focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500" value={formData.rating || 0} onChange={e => setFormData({ ...formData, rating: Number(e.target.value) })} />
+                        </div>
+                        <div className="flex items-center gap-3 mt-4">
+                            <input
+                                type="checkbox"
+                                id="is_available"
+                                className="w-5 h-5 rounded text-amber-500 focus:ring-amber-500 border-gray-300"
+                                checked={formData.is_available !== false} // Default to true if undefined
+                                onChange={e => setFormData({ ...formData, is_available: e.target.checked })}
+                            />
+                            <label htmlFor="is_available" className="text-sm font-medium text-slate-600 dark:text-slate-300 cursor-pointer">
+                                موجود در رستوران
+                            </label>
+                            <p className="text-xs text-slate-400 mr-2">(اگر تیک نداشته باشد، «ناموجود» نمایش داده می‌شود)</p>
                         </div>
                     </div>
 

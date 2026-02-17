@@ -25,6 +25,7 @@ interface MenuItem {
   time?: string;
   ingredients_en?: string[];
   ingredients_fa?: string[];
+  is_available?: boolean;
 }
 
 interface Review {
@@ -98,33 +99,32 @@ export default function PaeezRestaurant() {
         if (!res.ok) throw new Error('API Error');
         const rawData = await res.json();
 
-        // Adapt backend data (Array) to Frontend Structure (Object)
-        const adaptedData: MenuData = {
-          categories: Array.isArray(rawData) ? rawData.map((cat: any) => ({
-            id: cat.id,
-            title_en: cat.name,
-            title_fa: cat.name_fa || cat.name,
-            items: cat.items ? cat.items.map((item: any) => ({
-              id: item.id,
-              name_en: item.name,
-              name_fa: item.name_fa || item.name,
-              description_en: item.description,
-              description_fa: item.description_fa || item.description,
-              price: item.price,
-              image_url: item.image_url,
-              rating: item.rating || 0,
-              calories: item.calories || 0,
-              time: item.time || '',
-              ingredients_en: item.ingredients_en ? item.ingredients_en.split(',') : [],
-              ingredients_fa: item.ingredients_fa ? item.ingredients_fa.split(',') : []
-            })) : []
-          })) : []
-        };
+        // Transform Backend Data to Frontend Format
+        const transformedCategories = rawData.map((cat: any) => ({
+          id: cat.id,
+          title_en: cat.slug.replace('-', ' ').toUpperCase(), // Fallback
+          title_fa: cat.name_fa || cat.name,
+          items: cat.items.map((item: any) => ({
+            id: item.id,
+            name_en: item.name,
+            name_fa: item.name_fa,
+            description_en: item.description,
+            description_fa: item.description_fa,
+            price: item.price,
+            image_url: item.image_url,
+            rating: item.rating,
+            calories: item.calories,
+            time: item.time,
+            ingredients_en: item.ingredients_en ? item.ingredients_en.split(',') : [],
+            ingredients_fa: item.ingredients_fa ? item.ingredients_fa.split(',') : [],
+            is_available: item.is_available !== false // Default to true if missing
+          }))
+        }));
 
-        setMenuData(adaptedData);
-        if (adaptedData.categories?.length > 0) setActiveCategory(adaptedData.categories[0].id);
+        setMenuData({ categories: transformedCategories });
+        if (transformedCategories?.length > 0) setActiveCategory(transformedCategories[0].id);
       } catch (err) {
-        console.error("Fetch error:", err);
+        console.error('Failed to fetch menu:', err);
         setMenuData(FALLBACK_DATA);
         if (FALLBACK_DATA.categories.length > 0) {
           setActiveCategory(FALLBACK_DATA.categories[0].id);
@@ -133,6 +133,7 @@ export default function PaeezRestaurant() {
         setLoading(false);
       }
     };
+
     fetchMenu();
   }, []);
 
@@ -148,24 +149,30 @@ export default function PaeezRestaurant() {
 
   // --- Handlers ---
 
-  const handleCall = () => window.location.href = `tel:${CONFIG.phone}`;
+  const handleCall = () => window.open(`tel:${CONFIG.phone}`);
   const handleNavigate = () => window.open(CONFIG.mapsUrl, '_blank');
 
   const handleSaveContact = () => {
-    const blob = new Blob([CONFIG.vcard], { type: 'text/vcard' });
+    const vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:Paeez 96\nTEL:${CONFIG.phone}\nADR:;;${CONFIG.addressEn};;;\nEND:VCARD`;
+    const blob = new Blob([vcard], { type: 'text/vcard' });
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'Paeez96.vcf');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'paeez96.vcf';
+    a.click();
   };
 
   const handleShare = async () => {
-    const shareData = { title: t.title, text: t.subtitle, url: window.location.href };
     if (navigator.share) {
-      try { await navigator.share(shareData); } catch (err) { console.log('Share failed', err); }
+      try {
+        await navigator.share({
+          title: 'Paeez 96 Restaurant',
+          text: 'Check out this amazing menu!',
+          url: window.location.href,
+        });
+      } catch (err) {
+        console.log('Share failed', err);
+      }
     } else {
       navigator.clipboard.writeText(window.location.href);
       setIsCopied(true);
@@ -436,18 +443,30 @@ const MenuGrid = ({ loading, categories, isRTL, t, onItemClick }: any) => (
 
 const MenuItemCard = ({ item, isRTL, t, onClick }: any) => {
   const formatPrice = (price: number) => {
+    if (price === 0) return isRTL ? 'به نرخ روز' : 'Market Price';
     if (isRTL) return `${price.toLocaleString()} ${t.currencySuffix}`;
     return `${t.currency}${Math.round(price / 60000).toFixed(2)}`;
   };
+
+  const showPrice = item.is_available !== false; // Default true
 
   return (
     <div className="group relative cursor-pointer" onClick={onClick}>
       <div className="relative h-[280px] w-full rounded-[45px] overflow-hidden shadow-lg bg-white">
         <Image src={item.image_url} alt={isRTL ? item.name_fa : item.name_en} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
-        <div className={`absolute bottom-5 ${isRTL ? 'left-5' : 'right-5'} px-5 py-3 rounded-[20px] bg-white/30 backdrop-blur-md border border-white/40 text-white font-black text-lg shadow-xl`}>
-          {formatPrice(item.price)}
-        </div>
+
+        {/* Availability Badge / Price */}
+        {showPrice ? (
+          <div className={`absolute bottom-5 ${isRTL ? 'left-5' : 'right-5'} px-5 py-3 rounded-[20px] bg-white/30 backdrop-blur-md border border-white/40 text-white font-black text-lg shadow-xl`}>
+            {formatPrice(item.price)}
+          </div>
+        ) : (
+          <div className={`absolute bottom-5 ${isRTL ? 'left-5' : 'right-5'} px-5 py-3 rounded-[20px] bg-red-500/80 backdrop-blur-md border border-white/20 text-white font-bold text-sm shadow-xl`}>
+            {isRTL ? 'ناموجود' : 'Sold Out'}
+          </div>
+        )}
+
         {item.rating && (
           <div className={`absolute top-5 ${isRTL ? 'right-5' : 'left-5'} w-10 h-10 rounded-full bg-white text-slate-900 flex items-center justify-center font-bold text-xs shadow-lg`}>
             {item.rating}
@@ -488,9 +507,12 @@ const BaseModal = ({ onClose, children }: { onClose: () => void, children: React
 
 const ItemDetailModal = ({ item, onClose, isRTL, t }: any) => {
   const formatPrice = (price: number) => {
+    if (price === 0) return isRTL ? 'به نرخ روز' : 'Market Price';
     if (isRTL) return `${price.toLocaleString()} ${t.currencySuffix}`;
     return `${t.currency}${Math.round(price / 60000).toFixed(2)}`;
   };
+
+  const showPrice = item.is_available !== false;
 
   return (
     <BaseModal onClose={onClose}>
@@ -504,7 +526,11 @@ const ItemDetailModal = ({ item, onClose, isRTL, t }: any) => {
       <div className="px-8 pb-8 -mt-12 relative">
         <div className="flex justify-between items-start mb-4">
           <h2 className="text-3xl font-black text-slate-900 leading-none w-3/4">{isRTL ? item.name_fa : item.name_en}</h2>
-          <div className="text-xl font-bold text-slate-900 bg-slate-100 px-3 py-1.5 rounded-xl">{formatPrice(item.price)}</div>
+          {showPrice ? (
+            <div className="text-xl font-bold text-slate-900 bg-slate-100 px-3 py-1.5 rounded-xl">{formatPrice(item.price)}</div>
+          ) : (
+            <div className="text-sm font-bold text-white bg-red-500 px-3 py-1.5 rounded-xl">{isRTL ? 'ناموجود' : 'Sold Out'}</div>
+          )}
         </div>
         <p className="text-slate-500 font-medium leading-relaxed mb-6">{isRTL ? item.description_fa : item.description_en}</p>
         <div className="flex gap-4 mb-8 overflow-x-auto no-scrollbar">
@@ -645,6 +671,8 @@ const RestaurantInfoModal = ({ onClose, isRTL, t, isOpen, onCall, onNavigate }: 
 const CONFIG = {
   phone: "+989111851233",
   mapsUrl: "https://www.google.com/maps/dir/?api=1&destination=Paeez+96+Restaurant+Bandar+Anzali",
+  GET: "Atba Blvd, Ghazian, Bandar Anzali",
+  addressEn: "Atba Blvd, Ghazian, Bandar Anzali",
   vcard: `BEGIN:VCARD
 VERSION:3.0
 FN:Paeez 96 Restaurant
