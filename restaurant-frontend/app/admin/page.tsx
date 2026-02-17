@@ -676,7 +676,7 @@ const CategoryModal = ({ category, onClose, onSave }: any) => {
 
 const ItemModal = ({ item, categories, onClose, onSave }: any) => {
     const [formData, setFormData] = useState<Partial<MenuItem>>(
-        item || { category_id: categories[0]?.id || 1, price: 0 }
+        item || { category_id: categories[0]?.id || 1, price: 0, rating: 5 }
     );
 
     return (
@@ -769,6 +769,10 @@ const ItemModal = ({ item, categories, onClose, onSave }: any) => {
                         <div>
                             <label className="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-300">زمان آماده‌سازی (دقیقه)</label>
                             <input type="text" className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-800 dark:text-white focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500" value={formData.time || ''} onChange={e => setFormData({ ...formData, time: e.target.value })} />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-300">امتیاز (۰ تا ۵)</label>
+                            <input type="number" min="0" max="5" step="0.1" className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-800 dark:text-white focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500" value={formData.rating || 0} onChange={e => setFormData({ ...formData, rating: Number(e.target.value) })} />
                         </div>
                     </div>
 
