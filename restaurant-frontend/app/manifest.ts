@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
         description: 'Modern dining experience in Bandar Anzali',
         start_url: '/',
         display: 'standalone',
-        background_color: '#F8F9FB',
-        theme_color: '#F8F9FB',
+        background_color: '#edf1fa',
+        theme_color: '#edf1fa',
         icons: [
             {
                 src: '/icon.png',
