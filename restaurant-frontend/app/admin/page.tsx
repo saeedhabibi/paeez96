@@ -761,6 +761,23 @@ const ItemModal = ({ item, categories, onClose, onSave }: any) => {
                                 onChange={e => setFormData({ ...formData, description_fa: e.target.value })}
                             />
                         </div>
+                        <div className="col-span-1 md:col-span-2">
+                            <label className="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-300">محتویات (فارسی - با ویرگول جدا کنید)</label>
+                            <input
+                                className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-800 dark:text-white focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 mb-3"
+                                value={formData.ingredients_fa || ''}
+                                onChange={e => setFormData({ ...formData, ingredients_fa: e.target.value })}
+                                placeholder="مثال: گوشت، قارچ، پنیر"
+                            />
+                            <label className="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-300">محتویات (انگلیسی - با ویرگول جدا کنید)</label>
+                            <input
+                                className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl p-3 text-slate-800 dark:text-white text-left focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                                dir="ltr"
+                                value={formData.ingredients_en || ''}
+                                onChange={e => setFormData({ ...formData, ingredients_en: e.target.value })}
+                                placeholder="e.g. Beef, Mushroom, Cheese"
+                            />
+                        </div>
                         {/* Extra Fields */}
                         <div>
                             <label className="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-300">کالری</label>
