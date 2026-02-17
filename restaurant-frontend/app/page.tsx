@@ -462,7 +462,7 @@ const MenuItemCard = ({ item, isRTL, t, onClick }: any) => {
             {formatPrice(item.price)}
           </div>
         ) : (
-          <div className={`absolute bottom-5 ${isRTL ? 'left-5' : 'right-5'} px-5 py-3 rounded-[20px] bg-red-500/80 backdrop-blur-md border border-white/20 text-white font-bold text-sm shadow-xl`}>
+          <div className={`absolute bottom-5 ${isRTL ? 'left-5' : 'right-5'} px-5 py-3 rounded-[20px] bg-white/30 backdrop-blur-md border border-white/40 text-white font-black text-lg shadow-xl`}>
             {isRTL ? 'ناموجود' : 'Sold Out'}
           </div>
         )}
@@ -529,7 +529,7 @@ const ItemDetailModal = ({ item, onClose, isRTL, t }: any) => {
           {showPrice ? (
             <div className="text-xl font-bold text-slate-900 bg-slate-100 px-3 py-1.5 rounded-xl">{formatPrice(item.price)}</div>
           ) : (
-            <div className="text-sm font-bold text-white bg-red-500 px-3 py-1.5 rounded-xl">{isRTL ? 'ناموجود' : 'Sold Out'}</div>
+            <div className="text-xl font-bold text-slate-900 bg-slate-100 px-3 py-1.5 rounded-xl">{isRTL ? 'ناموجود' : 'Sold Out'}</div>
           )}
         </div>
         <p className="text-slate-500 font-medium leading-relaxed mb-6">{isRTL ? item.description_fa : item.description_en}</p>
