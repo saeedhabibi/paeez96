@@ -254,7 +254,6 @@ export default function PaeezRestaurant() {
               transform rotate-3 origin-center
               ${isRTL ? '-ml-2' : '-mr-2'}
             `}>
-              <span className="text-[9px] font-medium tracking-widest opacity-60 mb-0.5">{t.est}</span>
               <span className="text-2xl font-black tracking-tighter leading-none">96</span>
               <span className="text-[10px] font-bold mt-1 uppercase tracking-wider">Paeez</span>
             </div>
@@ -781,10 +780,10 @@ const MOCK_REVIEWS: Review[] = [
 
 const CONTENT = {
   en: {
-    title: "Paeez 96", subtitle: "Premium Dining • Lounge", address: "Mellat Bank, Ghazian, Bandar Anzali", openStatus: "Open Now", closedStatus: "Closed Now", hours: "12:00 PM - 12:00 AM", btnSave: "Save Contact", btnShare: "Share", search: "Search menu...", currency: "$", currencySuffix: "", popular: "Popular", loading: "Loading Menu...", menuTitle: "Our Menu", addToOrder: "Add to Order", ingredients: "Ingredients", calories: "Calories", min: "min", noResults: "No items found.", aboutTitle: "About Paeez 96", callNow: "Call Now", navigate: "Navigate", workingHours: "Working Hours", opensAt: "Opens at 12:00 PM", reviews: "Google Reviews", basedOn: "Based on 450+ reviews", viewMore: "View on Google Maps", copied: "Link copied!", est: "EST. 1996"
+    title: "Paeez 96", subtitle: "Premium Dining • Lounge", address: "Mellat Bank, Ghazian, Bandar Anzali", openStatus: "Open Now", closedStatus: "Closed Now", hours: "12:00 PM - 12:00 AM", btnSave: "Save Contact", btnShare: "Share", search: "Search menu...", currency: "$", currencySuffix: "", popular: "Popular", loading: "Loading Menu...", menuTitle: "Our Menu", addToOrder: "Add to Order", ingredients: "Ingredients", calories: "Calories", min: "min", noResults: "No items found.", aboutTitle: "About Paeez 96", callNow: "Call Now", navigate: "Navigate", workingHours: "Working Hours", opensAt: "Opens at 12:00 PM", reviews: "Google Reviews", basedOn: "Based on 450+ reviews", viewMore: "View on Google Maps", copied: "Link copied!"
   },
   fa: {
-    title: "رستوران پاییز ۹۶", subtitle: "رستوران • کافه • لانژ", address: "بندر انزلی، غازیان، جنب بانک ملت ", openStatus: "اکنون باز است", closedStatus: "اکنون بسته است", hours: "۱۲:۰۰ ظهر - ۱۲:۰۰ شب", btnSave: "ذخیره تماس", btnShare: "اشتراک", search: "جستجو در منو...", currency: "", currencySuffix: "تومان", popular: "محبوب", loading: "در حال بارگذاری...", menuTitle: "منوی ما", addToOrder: "افزودن به سفارش", ingredients: "محتویات", calories: "کالری", min: "دقیقه", noResults: "موردی یافت نشد.", aboutTitle: "درباره پاییز ۹۶", callNow: "تماس بگیرید", navigate: "مسیریابی", workingHours: "ساعات کاری", opensAt: "ساعت ۱۲:۰۰ باز می‌شود", reviews: "نظرات گوگل مپ", basedOn: "بر اساس بیش از ۴۵۰ نظر", viewMore: "مشاهده در گوگل مپ", copied: "لینک کپی شد!", est: "تأسیس ۱۳۷۵"
+    title: "رستوران پاییز ۹۶", subtitle: "رستوران • کافه • لانژ", address: "بندر انزلی، غازیان، جنب بانک ملت ", openStatus: "اکنون باز است", closedStatus: "اکنون بسته است", hours: "۱۲:۰۰ ظهر - ۱۲:۰۰ شب", btnSave: "ذخیره تماس", btnShare: "اشتراک", search: "جستجو در منو...", currency: "", currencySuffix: "تومان", popular: "محبوب", loading: "در حال بارگذاری...", menuTitle: "منوی ما", addToOrder: "افزودن به سفارش", ingredients: "محتویات", calories: "کالری", min: "دقیقه", noResults: "موردی یافت نشد.", aboutTitle: "درباره پاییز ۹۶", callNow: "تماس بگیرید", navigate: "مسیریابی", workingHours: "ساعات کاری", opensAt: "ساعت ۱۲:۰۰ باز می‌شود", reviews: "نظرات گوگل مپ", basedOn: "بر اساس بیش از ۴۵۰ نظر", viewMore: "مشاهده در گوگل مپ", copied: "لینک کپی شد!"
   }
 };
 
