@@ -572,7 +572,7 @@ const RestaurantInfoModal = ({ onClose, isRTL, t, isOpen, onCall, onNavigate }: 
       <X size={20} />
     </button>
     <div className="relative h-[250px] w-full">
-      <Image src="https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1000&auto=format&fit=crop" alt="Paeez 96" fill className="object-cover" />
+      <Image src={CONFIG.heroImage} alt="Paeez 96" fill className="object-cover" />
       <div className="absolute inset-0 bg-gradient-to-t from-[#F8F9FB] via-transparent to-transparent" />
     </div>
 
